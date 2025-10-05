@@ -3,26 +3,22 @@ import {
   useEvents,
   useEventListener,
 } from "../../shared/contexts/EventContext";
-
-interface Message {
-  text: string;
-  timestamp: number;
-}
+import type { AppMessagePayload } from "../../shared/types/events";
 
 export default function ExampleApp() {
   const events = useEvents();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<AppMessagePayload[]>([]);
 
   // Listen for messages from other apps
-  useEventListener<Message>("app-message", (payload) => {
+  useEventListener("app-message", (payload) => {
     setMessages((prev) => [...prev, payload]);
   });
 
   const sendMessage = async () => {
     if (!message.trim()) return;
 
-    const messageData: Message = {
+    const messageData: AppMessagePayload = {
       text: message,
       timestamp: Date.now(),
     };

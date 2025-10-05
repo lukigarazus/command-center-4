@@ -9,7 +9,7 @@ import {
   emit as tauriEmit,
   listen as tauriListen,
 } from "@tauri-apps/api/event";
-import type { EventEmitter, EventListener } from "../types/events";
+import type { EventEmitter, EventListener, EventMap } from "../types/events";
 import { isTauri } from "@tauri-apps/api/core";
 
 const EventContext = createContext<EventEmitter | null>(null);
@@ -21,11 +21,14 @@ const isTauriContext = () => {
 
 // Tauri event emitter implementation
 const createTauriEmitter = (): EventEmitter => ({
-  emit: async <T,>(eventType: string, payload: T) => {
-    await tauriEmit(eventType, payload);
+  emit: async <K extends keyof EventMap>(eventType: K, payload: EventMap[K]) => {
+    await tauriEmit(eventType as string, payload);
   },
-  listen: async <T,>(eventType: string, handler: EventListener<T>) => {
-    const unlisten = await tauriListen<T>(eventType, (event) => {
+  listen: async <K extends keyof EventMap>(
+    eventType: K,
+    handler: EventListener<EventMap[K]>
+  ) => {
+    const unlisten = await tauriListen<EventMap[K]>(eventType as string, (event) => {
       handler(event.payload);
     });
     return unlisten;
@@ -34,10 +37,13 @@ const createTauriEmitter = (): EventEmitter => ({
 
 // Stub web event emitter (for future implementation)
 const createWebEmitter = (): EventEmitter => ({
-  emit: async <T,>(eventType: string, payload: T) => {
+  emit: async <K extends keyof EventMap>(eventType: K, payload: EventMap[K]) => {
     console.log("[WebEmitter] Emit not implemented:", eventType, payload);
   },
-  listen: async <T,>(eventType: string, handler: EventListener<T>) => {
+  listen: async <K extends keyof EventMap>(
+    eventType: K,
+    handler: EventListener<EventMap[K]>
+  ) => {
     console.log("[WebEmitter] Listen not implemented:", eventType);
     return () => {};
   },
@@ -66,16 +72,16 @@ export const useEvents = (): EventEmitter => {
 };
 
 // Hook for subscribing to specific events
-export const useEventListener = <T,>(
-  eventType: string,
-  handler: EventListener<T>
+export const useEventListener = <K extends keyof EventMap>(
+  eventType: K,
+  handler: EventListener<EventMap[K]>
 ) => {
   const events = useEvents();
 
   useEffect(() => {
     let unlisten: (() => void) | undefined;
 
-    events.listen<T>(eventType, handler).then((unlistenFn) => {
+    events.listen(eventType, handler).then((unlistenFn) => {
       unlisten = unlistenFn;
     });
 

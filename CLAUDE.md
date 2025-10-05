@@ -3,3 +3,4 @@
 - There's an application called tauri-container that Tauri uses as it's main window on startup
 - The project uses Tailwind for styling.
 - Applications use an event system for communication. They use an EventContext in React, that provides different functionality based on the environment. Right now it only serves as a provider for the Tauri event system.
+- Every event type and its payload  should be defined in the shared package. The app-message event that is used right now should not work without being defined there. I want type safe communication
