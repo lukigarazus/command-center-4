@@ -18,6 +18,7 @@ export default defineConfig(async () => ({
         'example-app': resolve(__dirname, 'apps/example-app/index.html'),
         'calendar-app': resolve(__dirname, 'apps/calendar-app/index.html'),
         'weather-app': resolve(__dirname, 'apps/weather-app/index.html'),
+        'friends-app': resolve(__dirname, 'apps/friends-app/index.html'),
       },
     },
   },

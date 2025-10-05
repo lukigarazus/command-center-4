@@ -28,6 +28,12 @@ const apps: App[] = [
     description: "Display weather data and react to calendar events",
     path: "/apps/weather-app/index.html",
   },
+  {
+    id: "friends-app",
+    name: "Friends",
+    description: "Manage your friends list with avatars, tags, and meeting history",
+    path: "/apps/friends-app/index.html",
+  },
 ];
 
 export default function TauriContainer() {

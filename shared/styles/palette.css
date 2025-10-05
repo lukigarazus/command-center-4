@@ -123,3 +123,27 @@
 .bg-accent-hover:hover {
   background-color: rgb(var(--color-primary-hover));
 }
+
+.text-error {
+  color: rgb(var(--color-error));
+}
+
+.bg-error {
+  background-color: rgb(var(--color-error));
+}
+
+.text-warning {
+  color: rgb(var(--color-warning));
+}
+
+.bg-warning {
+  background-color: rgb(var(--color-warning));
+}
+
+.text-success {
+  color: rgb(var(--color-success));
+}
+
+.bg-success {
+  background-color: rgb(var(--color-success));
+}

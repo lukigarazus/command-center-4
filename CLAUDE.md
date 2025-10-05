@@ -10,3 +10,4 @@
 - Project should have a configurable color palette that depends on CSS selectors for top-level dark, light and other data-theme attributes. The palette should be defined with CSS variables and changed accordingly
 - The project uses tauri-plugin-store for its storage needs in a Tauri context. Every app is wrapped in a StorageProvider and is able to set key value pairs.
 - Image service - a service that allows saving, retrieving, removing and listing images. It should use Tauri's media directory to store them
+- Friends app - application that allows you to create and view a list of your friends. It allows upload of avatars. Every friend can have a list of tags assosiated with them. They also have a free text field for notes. Birthday is saved as well. Meeting dates are saved as well. You can schedule future meetings and see previous meetings. This app uses a reusable component for generating a heatmap.
