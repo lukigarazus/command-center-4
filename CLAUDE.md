@@ -6,3 +6,5 @@
 - Every event type and its payload  should be defined in the shared package. The app-message event that is used right now should not work without being defined there. I want type safe communication
 - Calendar app - an app that allows the user to select a day in a calendar and emits an event with the currently selected date
 - Weather app - displays weather data from OpenWeather. It uses a Rust endpoint to fetch weather data. Reacts to calendar events to refetch weather data. Handles unavailable data. On weather data change emits an event.
+- Applications should not have headers and exxessive paddings. Their styling should really be more akin to a widget. Application name should be visible in window title in case of Tauri and in Tab name in case of Web context
+- Project should have a configurable color palette that depends on CSS selectors for top-level dark, light and other data-theme attributes. The palette should be defined with CSS variables and changed accordingly

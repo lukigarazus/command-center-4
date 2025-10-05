@@ -129,30 +129,28 @@ export default function WeatherApp() {
   }, [lat, lon]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-blue-600 p-8">
+    <div className="min-h-screen bg-primary p-4">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold text-white mb-6">Weather</h1>
-
         {/* Location Status */}
         {geoError && (
-          <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-6">
-            <p className="text-yellow-800 text-sm">{geoError}</p>
-            <p className="text-yellow-700 text-xs mt-1">Using default location (London)</p>
+          <div className="bg-warning/20 border border-warning rounded-lg p-4 mb-4">
+            <p className="text-warning text-sm">{geoError}</p>
+            <p className="text-secondary text-xs mt-1">Using default location (London)</p>
           </div>
         )}
 
         {lat !== null && lon !== null && (
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 mb-6 text-white">
-            <p className="text-sm">
+          <div className="bg-surface/50 backdrop-blur-sm rounded-lg p-3 mb-4 border border-primary">
+            <p className="text-sm text-secondary">
               Location: {lat.toFixed(4)}°, {lon.toFixed(4)}°
             </p>
           </div>
         )}
 
         {selectedDate && (
-          <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-6">
-            <p className="text-blue-800 text-sm font-semibold">Forecast for:</p>
-            <p className="text-blue-900 text-lg">
+          <div className="bg-accent/20 border border-accent rounded-lg p-4 mb-4">
+            <p className="text-accent text-sm font-semibold">Forecast for:</p>
+            <p className="text-primary text-lg">
               {new Date(selectedDate).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
@@ -160,27 +158,27 @@ export default function WeatherApp() {
                 day: 'numeric',
               })}
             </p>
-            <p className="text-blue-700 text-xs mt-2">
+            <p className="text-secondary text-xs mt-2">
               5-day forecast available. Select a date within the next 5 days.
             </p>
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-xl p-8">
+        <div className="bg-surface rounded-lg shadow-xl p-6 border border-primary">
           {loading && (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-              <p className="mt-4 text-gray-600">Loading weather data...</p>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+              <p className="mt-4 text-secondary">Loading weather data...</p>
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-              <h3 className="text-red-800 font-semibold mb-2">Error</h3>
-              <p className="text-red-600">{error}</p>
+            <div className="bg-error/20 border border-error rounded-lg p-6">
+              <h3 className="text-error font-semibold mb-2">Error</h3>
+              <p className="text-error">{error}</p>
               <button
                 onClick={fetchWeather}
-                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                className="mt-4 px-4 py-2 bg-error text-white rounded hover:bg-error/90 transition-colors"
               >
                 Retry
               </button>
@@ -191,10 +189,10 @@ export default function WeatherApp() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900">
+                  <h2 className="text-3xl font-bold text-primary">
                     {weatherData.location}
                   </h2>
-                  <p className="text-gray-600 capitalize mt-1">
+                  <p className="text-secondary capitalize mt-1">
                     {weatherData.description}
                   </p>
                 </div>
@@ -205,22 +203,22 @@ export default function WeatherApp() {
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-6 mb-6">
-                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Temperature</p>
-                  <p className="text-3xl font-bold text-blue-600">
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="text-center p-4 bg-accent/10 rounded-lg border border-accent/20">
+                  <p className="text-sm text-secondary mb-1">Temperature</p>
+                  <p className="text-3xl font-bold text-accent">
                     {Math.round(weatherData.temperature)}°C
                   </p>
                 </div>
-                <div className="text-center p-4 bg-orange-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Feels Like</p>
-                  <p className="text-3xl font-bold text-orange-600">
+                <div className="text-center p-4 bg-accent/10 rounded-lg border border-accent/20">
+                  <p className="text-sm text-secondary mb-1">Feels Like</p>
+                  <p className="text-3xl font-bold text-accent">
                     {Math.round(weatherData.feels_like)}°C
                   </p>
                 </div>
-                <div className="text-center p-4 bg-cyan-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Humidity</p>
-                  <p className="text-3xl font-bold text-cyan-600">
+                <div className="text-center p-4 bg-accent/10 rounded-lg border border-accent/20">
+                  <p className="text-sm text-secondary mb-1">Humidity</p>
+                  <p className="text-3xl font-bold text-accent">
                     {weatherData.humidity}%
                   </p>
                 </div>
@@ -228,7 +226,7 @@ export default function WeatherApp() {
 
               <button
                 onClick={fetchWeather}
-                className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
+                className="w-full px-4 py-3 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors font-semibold"
               >
                 Refresh Weather
               </button>
@@ -237,10 +235,10 @@ export default function WeatherApp() {
 
           {!loading && !error && !weatherData && (
             <div className="text-center py-12">
-              <p className="text-gray-600 mb-4">No weather data available</p>
+              <p className="text-secondary mb-4">No weather data available</p>
               <button
                 onClick={fetchWeather}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-accent text-white rounded hover:bg-accent/90 transition-colors"
               >
                 Load Weather
               </button>

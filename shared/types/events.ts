@@ -24,11 +24,17 @@ export interface WeatherDataChangedPayload {
   timestamp: number;
 }
 
+export interface ThemeChangedPayload {
+  theme: 'light' | 'dark' | 'auto';
+  timestamp: number;
+}
+
 // Define the event map with event names and their payload types
 export interface EventMap {
   'app-message': AppMessagePayload;
   'calendar-date-selected': CalendarDateSelectedPayload;
   'weather-data-changed': WeatherDataChangedPayload;
+  'theme-changed': ThemeChangedPayload;
 }
 
 // Type-safe event emitter

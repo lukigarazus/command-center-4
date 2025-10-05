@@ -8,6 +8,8 @@ import {
 import {
   emit as tauriEmit,
   listen as tauriListen,
+  TauriEvent,
+  EmitOptions,
 } from "@tauri-apps/api/event";
 import type { EventEmitter, EventListener, EventMap } from "../types/events";
 import { isTauri } from "@tauri-apps/api/core";
@@ -22,6 +24,7 @@ const isTauriContext = () => {
 // Tauri event emitter implementation
 const createTauriEmitter = (): EventEmitter => ({
   emit: async <K extends keyof EventMap>(eventType: K, payload: EventMap[K]) => {
+    // Emit to all windows
     await tauriEmit(eventType as string, payload);
   },
   listen: async <K extends keyof EventMap>(

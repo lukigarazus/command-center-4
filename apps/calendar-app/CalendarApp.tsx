@@ -68,23 +68,21 @@ export default function CalendarApp() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-primary p-4">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Calendar</h1>
-
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-surface rounded-lg shadow p-6 border border-primary">
           {/* Calendar Header */}
           <div className="flex items-center justify-between mb-6">
             <button
               onClick={handlePreviousMonth}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+              className="px-4 py-2 text-secondary hover:text-primary hover:bg-surface-hover rounded transition-colors"
             >
               ←
             </button>
-            <h2 className="text-xl font-semibold text-gray-900">{monthName}</h2>
+            <h2 className="text-xl font-semibold text-primary">{monthName}</h2>
             <button
               onClick={handleNextMonth}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+              className="px-4 py-2 text-secondary hover:text-primary hover:bg-surface-hover rounded transition-colors"
             >
               →
             </button>
@@ -96,7 +94,7 @@ export default function CalendarApp() {
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
               <div
                 key={day}
-                className="text-center text-sm font-semibold text-gray-600 py-2"
+                className="text-center text-sm font-semibold text-secondary py-2"
               >
                 {day}
               </div>
@@ -117,10 +115,10 @@ export default function CalendarApp() {
                   transition-all
                   ${
                     isSelectedDate(day)
-                      ? 'bg-blue-500 text-white font-bold'
+                      ? 'bg-accent text-white font-bold'
                       : isToday(day)
-                      ? 'bg-blue-100 text-blue-900 font-semibold'
-                      : 'hover:bg-gray-100 text-gray-700'
+                      ? 'bg-accent/20 text-accent font-semibold'
+                      : 'hover:bg-surface-hover text-primary'
                   }
                 `}
               >
@@ -131,9 +129,9 @@ export default function CalendarApp() {
 
           {/* Selected Date Display */}
           {selectedDate && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <p className="text-sm text-gray-600">Selected Date:</p>
-              <p className="text-lg font-semibold text-gray-900">
+            <div className="mt-6 pt-6 border-t border-primary">
+              <p className="text-sm text-secondary">Selected Date:</p>
+              <p className="text-lg font-semibold text-primary">
                 {selectedDate.toLocaleDateString('en-US', {
                   weekday: 'long',
                   year: 'numeric',

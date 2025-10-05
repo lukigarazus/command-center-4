@@ -1,5 +1,6 @@
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { commands } from "../../shared/api";
+import { useTheme } from "../../shared/contexts/ThemeContext";
 
 interface App {
   id: string;
@@ -30,6 +31,8 @@ const apps: App[] = [
 ];
 
 export default function TauriContainer() {
+  const { theme, setTheme } = useTheme();
+
   const launchApp = async (app: App) => {
     // Create unique window ID by appending timestamp
     const windowId = `${app.id}-${Date.now()}`;
@@ -51,24 +54,65 @@ export default function TauriContainer() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-primary p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          Command Center
-        </h1>
-        <p className="text-gray-600 mb-8">Select an application to launch</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-primary mb-2">
+              Command Center
+            </h1>
+            <p className="text-secondary">Select an application to launch</p>
+          </div>
+
+          {/* Theme Switcher */}
+          <div className="flex gap-2 bg-surface rounded-lg p-1 border border-primary">
+            <button
+              onClick={() => setTheme('light')}
+              className={`px-3 py-2 rounded transition-colors ${
+                theme === 'light'
+                  ? 'bg-accent text-white'
+                  : 'text-secondary hover:text-primary'
+              }`}
+              title="Light theme"
+            >
+              ☀️
+            </button>
+            <button
+              onClick={() => setTheme('dark')}
+              className={`px-3 py-2 rounded transition-colors ${
+                theme === 'dark'
+                  ? 'bg-accent text-white'
+                  : 'text-secondary hover:text-primary'
+              }`}
+              title="Dark theme"
+            >
+              🌙
+            </button>
+            <button
+              onClick={() => setTheme('auto')}
+              className={`px-3 py-2 rounded transition-colors ${
+                theme === 'auto'
+                  ? 'bg-accent text-white'
+                  : 'text-secondary hover:text-primary'
+              }`}
+              title="Auto theme"
+            >
+              💻
+            </button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {apps.map((app) => (
             <button
               key={app.id}
               onClick={() => launchApp(app)}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left"
+              className="bg-surface rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left border border-primary hover:bg-surface-hover"
             >
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-xl font-semibold text-primary mb-2">
                 {app.name}
               </h2>
-              <p className="text-gray-600">{app.description}</p>
+              <p className="text-secondary">{app.description}</p>
             </button>
           ))}
         </div>
