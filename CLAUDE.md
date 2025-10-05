@@ -1,0 +1,5 @@
+- This is a project that serves as a container for small, personal applications.
+- Every application should be a separate Vite endpoint, so that they can be accessed separately.
+- There's an application called tauri-container that Tauri uses as it's main window on startup
+- The project uses Tailwind for styling.
+- Applications use an event system for communication. They use an EventContext in React, that provides different functionality based on the environment. Right now it only serves as a provider for the Tauri event system.
