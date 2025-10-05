@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useEvents, useEventListener } from '../../shared/contexts/EventContext';
+import { useStorage } from '../../shared/contexts/StorageContext';
 import { commands } from '../../shared/api';
 import type { WeatherData } from '../../shared/types/bindings';
 
 export default function WeatherApp() {
   const events = useEvents();
+  const storage = useStorage();
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +60,7 @@ export default function WeatherApp() {
 
     const setupListener = async () => {
       const storageKey = 'event:calendar-date-selected';
-      const stored = localStorage.getItem(storageKey);
+      const stored = await storage.getItem(storageKey);
       if (stored && !hasInitialized) {
         try {
           const payload = JSON.parse(stored);
@@ -90,7 +92,7 @@ export default function WeatherApp() {
         unlisten();
       }
     };
-  }, [lat, lon, events]);
+  }, [lat, lon, events, storage]);
 
   // Get user's location from IP
   useEffect(() => {

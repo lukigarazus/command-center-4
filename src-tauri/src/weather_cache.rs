@@ -1,7 +1,7 @@
+use crate::weather::WeatherData;
+use moka::future::Cache;
 use std::sync::OnceLock;
 use std::time::Duration;
-use moka::future::Cache;
-use crate::weather::WeatherData;
 
 static WEATHER_CACHE: OnceLock<WeatherCache> = OnceLock::new();
 

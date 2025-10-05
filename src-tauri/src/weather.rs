@@ -1,6 +1,6 @@
+use crate::weather_cache::WeatherCache;
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use crate::weather_cache::WeatherCache;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct WeatherData {
@@ -63,17 +63,21 @@ pub async fn fetch_weather(lat: f64, lon: f64, api_key: &str) -> Result<WeatherD
         .await
         .map_err(|e| format!("Failed to read response body: {}", e))?;
 
-    let data: OpenWeatherResponse = serde_json::from_str(&body)
-        .map_err(|e| format!("Failed to parse weather data: {}", e))?;
+    let data: OpenWeatherResponse =
+        serde_json::from_str(&body).map_err(|e| format!("Failed to parse weather data: {}", e))?;
 
     let weather_data = WeatherData {
         temperature: data.main.temp,
         feels_like: data.main.feels_like,
         humidity: data.main.humidity,
-        description: data.weather.first()
+        description: data
+            .weather
+            .first()
             .map(|w| w.description.clone())
             .unwrap_or_else(|| "Unknown".to_string()),
-        icon: data.weather.first()
+        icon: data
+            .weather
+            .first()
             .map(|w| w.icon.clone())
             .unwrap_or_else(|| "01d".to_string()),
         location: data.name,
@@ -127,7 +131,9 @@ pub async fn fetch_forecast_for_date(
     let now = chrono::Utc::now();
 
     // Start of today (allows selecting today)
-    let start_of_today = now.date_naive().and_hms_opt(0, 0, 0)
+    let start_of_today = now
+        .date_naive()
+        .and_hms_opt(0, 0, 0)
         .ok_or("Failed to create start of day")?
         .and_utc()
         .timestamp();
@@ -159,8 +165,8 @@ pub async fn fetch_forecast_for_date(
         .await
         .map_err(|e| format!("Failed to read response body: {}", e))?;
 
-    let data: ForecastResponse = serde_json::from_str(&body)
-        .map_err(|e| format!("Failed to parse forecast data: {}", e))?;
+    let data: ForecastResponse =
+        serde_json::from_str(&body).map_err(|e| format!("Failed to parse forecast data: {}", e))?;
 
     // Find the forecast closest to the target date
     let closest_forecast = data
@@ -173,10 +179,14 @@ pub async fn fetch_forecast_for_date(
         temperature: closest_forecast.main.temp,
         feels_like: closest_forecast.main.feels_like,
         humidity: closest_forecast.main.humidity,
-        description: closest_forecast.weather.first()
+        description: closest_forecast
+            .weather
+            .first()
             .map(|w| w.description.clone())
             .unwrap_or_else(|| "Unknown".to_string()),
-        icon: closest_forecast.weather.first()
+        icon: closest_forecast
+            .weather
+            .first()
             .map(|w| w.icon.clone())
             .unwrap_or_else(|| "01d".to_string()),
         location: data.city.name,
@@ -184,7 +194,9 @@ pub async fn fetch_forecast_for_date(
     };
 
     // Store in cache
-    cache.set_forecast(lat, lon, date, weather_data.clone()).await;
+    cache
+        .set_forecast(lat, lon, date, weather_data.clone())
+        .await;
 
     Ok(weather_data)
 }

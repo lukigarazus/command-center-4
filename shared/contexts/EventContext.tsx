@@ -13,6 +13,7 @@ import {
 } from "@tauri-apps/api/event";
 import type { EventEmitter, EventListener, EventMap } from "../types/events";
 import { isTauri } from "@tauri-apps/api/core";
+import { useStorage } from "./StorageContext";
 
 const EventContext = createContext<EventEmitter | null>(null);
 
@@ -21,15 +22,15 @@ const isTauriContext = () => {
   return isTauri();
 };
 
-// Helper to get localStorage key for event type
+// Helper to get storage key for event type
 const getEventStorageKey = (eventType: string) => `event:${eventType}`;
 
 // Tauri event emitter implementation
-const createTauriEmitter = (): EventEmitter => ({
+const createTauriEmitter = (storage: any): EventEmitter => ({
   emit: async <K extends keyof EventMap>(eventType: K, payload: EventMap[K]) => {
-    // Store the event in localStorage
+    // Store the event in storage
     const storageKey = getEventStorageKey(eventType as string);
-    localStorage.setItem(storageKey, JSON.stringify(payload));
+    await storage.setItem(storageKey, JSON.stringify(payload));
 
     // Emit to all windows
     await tauriEmit(eventType as string, payload);
@@ -47,11 +48,11 @@ const createTauriEmitter = (): EventEmitter => ({
 });
 
 // Stub web event emitter (for future implementation)
-const createWebEmitter = (): EventEmitter => ({
+const createWebEmitter = (storage: any): EventEmitter => ({
   emit: async <K extends keyof EventMap>(eventType: K, payload: EventMap[K]) => {
-    // Store the event in localStorage
+    // Store the event in storage
     const storageKey = getEventStorageKey(eventType as string);
-    localStorage.setItem(storageKey, JSON.stringify(payload));
+    await storage.setItem(storageKey, JSON.stringify(payload));
 
     console.log("[WebEmitter] Emit not implemented:", eventType, payload);
   },
@@ -69,8 +70,9 @@ interface EventProviderProps {
 }
 
 export const EventProvider = ({ children }: EventProviderProps) => {
+  const storage = useStorage();
   const [emitter] = useState<EventEmitter>(() =>
-    isTauriContext() ? createTauriEmitter() : createWebEmitter()
+    isTauriContext() ? createTauriEmitter(storage) : createWebEmitter(storage)
   );
 
   return (
@@ -92,6 +94,7 @@ export const useEventListener = <K extends keyof EventMap>(
   handler: EventListener<EventMap[K]>
 ) => {
   const events = useEvents();
+  const storage = useStorage();
   const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
@@ -101,7 +104,7 @@ export const useEventListener = <K extends keyof EventMap>(
       // Only load from storage on first mount
       if (!hasInitialized) {
         const storageKey = getEventStorageKey(eventType as string);
-        const stored = localStorage.getItem(storageKey);
+        const stored = await storage.getItem(storageKey);
         if (stored) {
           try {
             const payload = JSON.parse(stored) as EventMap[K];
@@ -125,5 +128,5 @@ export const useEventListener = <K extends keyof EventMap>(
         unlisten();
       }
     };
-  }, [eventType, events]);
+  }, [eventType, events, storage]);
 };

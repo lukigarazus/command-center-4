@@ -1,13 +1,13 @@
 mod env;
+mod geolocation;
 mod weather;
 mod weather_cache;
-mod geolocation;
 
-use specta::Type;
+use geolocation::Coordinates;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use tauri_specta::{collect_commands, Builder};
 use weather::WeatherData;
-use geolocation::Coordinates;
 
 // Example type-safe command
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
@@ -48,8 +48,12 @@ pub fn run() {
     // Initialize environment configuration
     env::EnvConfig::init().expect("Failed to load environment variables");
 
-    let builder = Builder::<tauri::Wry>::new()
-        .commands(collect_commands![greet, fetch_weather, fetch_weather_for_date, get_location]);
+    let builder = Builder::<tauri::Wry>::new().commands(collect_commands![
+        greet,
+        fetch_weather,
+        fetch_weather_for_date,
+        get_location
+    ]);
 
     #[cfg(debug_assertions)]
     builder
@@ -60,6 +64,7 @@ pub fn run() {
         .expect("Failed to export typescript bindings");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_http::init())
         .invoke_handler(builder.invoke_handler())

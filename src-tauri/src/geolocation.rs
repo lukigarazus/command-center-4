@@ -34,8 +34,8 @@ pub async fn get_location_from_ip() -> Result<Coordinates, String> {
         .await
         .map_err(|e| format!("Failed to read response: {}", e))?;
 
-    let data: IpApiResponse = serde_json::from_str(&body)
-        .map_err(|e| format!("Failed to parse location data: {}", e))?;
+    let data: IpApiResponse =
+        serde_json::from_str(&body).map_err(|e| format!("Failed to parse location data: {}", e))?;
 
     Ok(Coordinates {
         latitude: data.lat,

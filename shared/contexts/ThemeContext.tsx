@@ -20,6 +20,7 @@ interface ThemeProviderProps {
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const events = useEvents();
   const [theme, setThemeState] = useState<Theme>(() => {
+    // Load from global localStorage (not app-scoped)
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
     return (stored as Theme) || 'auto';
   });
