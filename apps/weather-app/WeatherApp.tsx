@@ -13,13 +13,84 @@ export default function WeatherApp() {
   const [lon, setLon] = useState<number | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
 
-  // Listen for calendar date selection events
-  useEventListener('calendar-date-selected', async (payload) => {
-    setSelectedDate(payload.date);
-    if (lat !== null && lon !== null) {
-      await fetchWeatherForDate(payload.date);
+  const fetchWeatherForDate = async (date: string) => {
+    if (lat === null || lon === null) {
+      setError('Location not available');
+      return;
     }
-  });
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await commands.fetchWeatherForDate(lat, lon, date);
+
+      if (result.status === 'error') {
+        throw new Error(result.error);
+      }
+
+      const data = result.data;
+      setWeatherData(data);
+
+      // Emit weather data changed event
+      await events.emit('weather-data-changed', {
+        temperature: data.temperature,
+        feels_like: data.feels_like,
+        humidity: data.humidity,
+        description: data.description,
+        icon: data.icon,
+        location: data.location,
+        date: data.date,
+        timestamp: Date.now(),
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setWeatherData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Listen for calendar date selection events
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    let hasInitialized = false;
+
+    const setupListener = async () => {
+      const storageKey = 'event:calendar-date-selected';
+      const stored = localStorage.getItem(storageKey);
+      if (stored && !hasInitialized) {
+        try {
+          const payload = JSON.parse(stored);
+          setSelectedDate(payload.date);
+          if (lat !== null && lon !== null) {
+            await fetchWeatherForDate(payload.date);
+          }
+        } catch (e) {
+          console.error('Failed to parse stored event:', e);
+        }
+        hasInitialized = true;
+      }
+
+      const unlistenFn = await events.listen('calendar-date-selected', async (payload) => {
+        setSelectedDate(payload.date);
+        if (lat !== null && lon !== null) {
+          await fetchWeatherForDate(payload.date);
+        }
+      });
+      unlisten = unlistenFn;
+    };
+
+    if (lat !== null && lon !== null) {
+      setupListener();
+    }
+
+    return () => {
+      if (unlisten) {
+        unlisten();
+      }
+    };
+  }, [lat, lon, events]);
 
   // Get user's location from IP
   useEffect(() => {
@@ -82,51 +153,6 @@ export default function WeatherApp() {
       setLoading(false);
     }
   };
-
-  const fetchWeatherForDate = async (date: string) => {
-    if (lat === null || lon === null) {
-      setError('Location not available');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await commands.fetchWeatherForDate(lat, lon, date);
-
-      if (result.status === 'error') {
-        throw new Error(result.error);
-      }
-
-      const data = result.data;
-      setWeatherData(data);
-
-      // Emit weather data changed event
-      await events.emit('weather-data-changed', {
-        temperature: data.temperature,
-        feels_like: data.feels_like,
-        humidity: data.humidity,
-        description: data.description,
-        icon: data.icon,
-        location: data.location,
-        date: data.date,
-        timestamp: Date.now(),
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-      setWeatherData(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch weather when coordinates are available
-  useEffect(() => {
-    if (lat !== null && lon !== null) {
-      fetchWeather();
-    }
-  }, [lat, lon]);
 
   return (
     <div className="min-h-screen bg-primary p-4">
