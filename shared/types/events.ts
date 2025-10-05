@@ -13,10 +13,22 @@ export interface CalendarDateSelectedPayload {
   timestamp: number;
 }
 
+export interface WeatherDataChangedPayload {
+  temperature: number;
+  feels_like: number;
+  humidity: number;
+  description: string;
+  icon: string;
+  location: string;
+  date: string; // ISO 8601 date string
+  timestamp: number;
+}
+
 // Define the event map with event names and their payload types
 export interface EventMap {
   'app-message': AppMessagePayload;
   'calendar-date-selected': CalendarDateSelectedPayload;
+  'weather-data-changed': WeatherDataChangedPayload;
 }
 
 // Type-safe event emitter

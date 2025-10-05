@@ -21,6 +21,12 @@ const apps: App[] = [
     description: "Select dates and emit calendar events",
     path: "/apps/calendar-app/index.html",
   },
+  {
+    id: "weather-app",
+    name: "Weather",
+    description: "Display weather data and react to calendar events",
+    path: "/apps/weather-app/index.html",
+  },
 ];
 
 export default function TauriContainer() {

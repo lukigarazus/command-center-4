@@ -29,9 +29,16 @@ export default function CalendarApp() {
     const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     setSelectedDate(selected);
 
-    // Emit event with selected date
+    // Emit event with selected date at noon UTC to avoid timezone issues
+    const dateAtNoon = new Date(Date.UTC(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day,
+      12, 0, 0
+    ));
+
     await events.emit('calendar-date-selected', {
-      date: selected.toISOString(),
+      date: dateAtNoon.toISOString(),
       timestamp: Date.now(),
     });
   };

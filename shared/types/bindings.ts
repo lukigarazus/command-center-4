@@ -7,6 +7,30 @@
 export const commands = {
 async greet(name: string) : Promise<GreetResponse> {
     return await TAURI_INVOKE("greet", { name });
+},
+async fetchWeather(lat: number, lon: number) : Promise<Result<WeatherData, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("fetch_weather", { lat, lon }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async fetchWeatherForDate(lat: number, lon: number, date: string) : Promise<Result<WeatherData, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("fetch_weather_for_date", { lat, lon, date }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getLocation() : Promise<Result<Coordinates, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_location") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -20,7 +44,9 @@ async greet(name: string) : Promise<GreetResponse> {
 
 /** user-defined types **/
 
+export type Coordinates = { latitude: number; longitude: number }
 export type GreetResponse = { message: string }
+export type WeatherData = { temperature: number; feels_like: number; humidity: number; description: string; icon: string; location: string; date: string }
 
 /** tauri-specta globals **/
 
