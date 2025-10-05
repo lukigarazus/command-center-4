@@ -1,3 +1,5 @@
+mod env;
+
 use specta::Type;
 use serde::{Deserialize, Serialize};
 use tauri_specta::{collect_commands, Builder};
@@ -18,6 +20,9 @@ fn greet(name: String) -> GreetResponse {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Initialize environment configuration
+    env::EnvConfig::init().expect("Failed to load environment variables");
+
     let builder = Builder::<tauri::Wry>::new()
         .commands(collect_commands![greet]);
 
