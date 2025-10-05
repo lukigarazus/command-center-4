@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { StorageProvider } from './StorageContext';
 import { EventProvider } from './EventContext';
 import { ThemeProvider } from './ThemeContext';
+import { ImageProvider } from './ImageContext';
 
 interface AppProvidersProps {
   appName: string;
@@ -13,7 +14,9 @@ export const AppProviders = ({ appName, children }: AppProvidersProps) => {
     <StorageProvider appName={appName}>
       <EventProvider>
         <ThemeProvider>
-          {children}
+          <ImageProvider>
+            {children}
+          </ImageProvider>
         </ThemeProvider>
       </EventProvider>
     </StorageProvider>

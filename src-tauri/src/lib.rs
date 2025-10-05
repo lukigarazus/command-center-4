@@ -1,9 +1,11 @@
 mod env;
 mod geolocation;
+mod image_service;
 mod weather;
 mod weather_cache;
 
 use geolocation::Coordinates;
+use image_service::ImageInfo;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri_specta::{collect_commands, Builder};
@@ -52,7 +54,11 @@ pub fn run() {
         greet,
         fetch_weather,
         fetch_weather_for_date,
-        get_location
+        get_location,
+        image_service::save_image,
+        image_service::get_image,
+        image_service::remove_image,
+        image_service::list_images
     ]);
 
     #[cfg(debug_assertions)]

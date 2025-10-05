@@ -31,6 +31,38 @@ async getLocation() : Promise<Result<Coordinates, string>> {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+async saveImage(name: string, data: number[]) : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("save_image", { name, data }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getImage(name: string) : Promise<Result<number[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_image", { name }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async removeImage(name: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("remove_image", { name }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listImages() : Promise<Result<ImageInfo[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_images") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -46,6 +78,7 @@ async getLocation() : Promise<Result<Coordinates, string>> {
 
 export type Coordinates = { latitude: number; longitude: number }
 export type GreetResponse = { message: string }
+export type ImageInfo = { name: string; path: string }
 export type WeatherData = { temperature: number; feels_like: number; humidity: number; description: string; icon: string; location: string; date: string }
 
 /** tauri-specta globals **/

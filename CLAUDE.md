@@ -9,3 +9,4 @@
 - Applications should not have headers and exxessive paddings. Their styling should really be more akin to a widget. Application name should be visible in window title in case of Tauri and in Tab name in case of Web context
 - Project should have a configurable color palette that depends on CSS selectors for top-level dark, light and other data-theme attributes. The palette should be defined with CSS variables and changed accordingly
 - The project uses tauri-plugin-store for its storage needs in a Tauri context. Every app is wrapped in a StorageProvider and is able to set key value pairs.
+- Image service - a service that allows saving, retrieving, removing and listing images. It should use Tauri's media directory to store them
