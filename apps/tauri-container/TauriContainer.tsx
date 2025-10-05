@@ -18,7 +18,10 @@ const apps: App[] = [
 
 export default function TauriContainer() {
   const launchApp = async (app: App) => {
-    const webview = new WebviewWindow(app.id, {
+    // Create unique window ID by appending timestamp
+    const windowId = `${app.id}-${Date.now()}`;
+
+    const webview = new WebviewWindow(windowId, {
       url: app.path,
       title: app.name,
       width: 800,

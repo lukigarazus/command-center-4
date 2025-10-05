@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { useEvents, useEventListener } from '../../shared/contexts/EventContext';
+import { useState } from "react";
+import {
+  useEvents,
+  useEventListener,
+} from "../../shared/contexts/EventContext";
 
 interface Message {
   text: string;
@@ -8,11 +11,11 @@ interface Message {
 
 export default function ExampleApp() {
   const events = useEvents();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
 
   // Listen for messages from other apps
-  useEventListener<Message>('app-message', (payload) => {
+  useEventListener<Message>("app-message", (payload) => {
     setMessages((prev) => [...prev, payload]);
   });
 
@@ -24,9 +27,9 @@ export default function ExampleApp() {
       timestamp: Date.now(),
     };
 
-    await events.emit('app-message', messageData);
-    setMessages((prev) => [...prev, messageData]);
-    setMessage('');
+    await events.emit("app-message", messageData);
+    // setMessages((prev) => [...prev, messageData]);
+    setMessage("");
   };
 
   return (
@@ -43,7 +46,7 @@ export default function ExampleApp() {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               placeholder="Type a message..."
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

@@ -1,12 +1,22 @@
-import { createContext, useContext, ReactNode, useEffect, useState } from 'react';
-import { emit as tauriEmit, listen as tauriListen } from '@tauri-apps/api/event';
-import type { EventEmitter, EventListener } from '../types/events';
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
+import {
+  emit as tauriEmit,
+  listen as tauriListen,
+} from "@tauri-apps/api/event";
+import type { EventEmitter, EventListener } from "../types/events";
+import { isTauri } from "@tauri-apps/api/core";
 
 const EventContext = createContext<EventEmitter | null>(null);
 
 // Detect if we're running in Tauri context
 const isTauriContext = () => {
-  return typeof window !== 'undefined' && '__TAURI__' in window;
+  return isTauri();
 };
 
 // Tauri event emitter implementation
@@ -25,10 +35,10 @@ const createTauriEmitter = (): EventEmitter => ({
 // Stub web event emitter (for future implementation)
 const createWebEmitter = (): EventEmitter => ({
   emit: async <T,>(eventType: string, payload: T) => {
-    console.log('[WebEmitter] Emit not implemented:', eventType, payload);
+    console.log("[WebEmitter] Emit not implemented:", eventType, payload);
   },
   listen: async <T,>(eventType: string, handler: EventListener<T>) => {
-    console.log('[WebEmitter] Listen not implemented:', eventType);
+    console.log("[WebEmitter] Listen not implemented:", eventType);
     return () => {};
   },
 });
@@ -42,13 +52,15 @@ export const EventProvider = ({ children }: EventProviderProps) => {
     isTauriContext() ? createTauriEmitter() : createWebEmitter()
   );
 
-  return <EventContext.Provider value={emitter}>{children}</EventContext.Provider>;
+  return (
+    <EventContext.Provider value={emitter}>{children}</EventContext.Provider>
+  );
 };
 
 export const useEvents = (): EventEmitter => {
   const context = useContext(EventContext);
   if (!context) {
-    throw new Error('useEvents must be used within EventProvider');
+    throw new Error("useEvents must be used within EventProvider");
   }
   return context;
 };
