@@ -1,10 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useEvents } from '../../shared/contexts/EventContext';
 
 export default function CalendarApp() {
   const events = useEvents();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  // Emit today's date on startup
+  useEffect(() => {
+    const today = new Date();
+    const dateAtNoon = new Date(Date.UTC(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      12, 0, 0
+    ));
+
+    events.emit('calendar-date-selected', {
+      date: dateAtNoon.toISOString(),
+      timestamp: Date.now(),
+    });
+
+    setSelectedDate(today);
+  }, []);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
