@@ -4,3 +4,5 @@
 - The project uses Tailwind for styling.
 - Applications use an event system for communication. They use an EventContext in React, that provides different functionality based on the environment. Right now it only serves as a provider for the Tauri event system.
 - Every event type and its payload  should be defined in the shared package. The app-message event that is used right now should not work without being defined there. I want type safe communication
+- Calendar app - an app that allows the user to select a day in a calendar and emits an event with the currently selected date
+- Weather app - displays weather data from OpenWeather. It uses a Rust endpoint to fetch weather data. Reacts to calendar events to refetch weather data. Handles unavailable data. On weather data change emits an event.

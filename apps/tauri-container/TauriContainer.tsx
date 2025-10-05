@@ -15,6 +15,12 @@ const apps: App[] = [
     description: "A sample application demonstrating the pattern",
     path: "/apps/example-app/index.html",
   },
+  {
+    id: "calendar-app",
+    name: "Calendar",
+    description: "Select dates and emit calendar events",
+    path: "/apps/calendar-app/index.html",
+  },
 ];
 
 export default function TauriContainer() {

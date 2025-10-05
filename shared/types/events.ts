@@ -8,10 +8,15 @@ export interface AppMessagePayload {
   timestamp: number;
 }
 
+export interface CalendarDateSelectedPayload {
+  date: string; // ISO 8601 date string
+  timestamp: number;
+}
+
 // Define the event map with event names and their payload types
 export interface EventMap {
   'app-message': AppMessagePayload;
-  // Add more events here as needed
+  'calendar-date-selected': CalendarDateSelectedPayload;
 }
 
 // Type-safe event emitter

@@ -16,6 +16,7 @@ export default defineConfig(async () => ({
       input: {
         'tauri-container': resolve(__dirname, 'apps/tauri-container/index.html'),
         'example-app': resolve(__dirname, 'apps/example-app/index.html'),
+        'calendar-app': resolve(__dirname, 'apps/calendar-app/index.html'),
       },
     },
   },
