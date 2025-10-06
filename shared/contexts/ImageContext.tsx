@@ -6,6 +6,7 @@ import type { ImageInfo } from '../types/bindings';
 interface ImageServiceInterface {
   saveImage: (name: string, data: Uint8Array) => Promise<string>;
   getImage: (name: string) => Promise<Uint8Array>;
+  getImagePath: (name: string) => Promise<string>;
   removeImage: (name: string) => Promise<void>;
   listImages: () => Promise<ImageInfo[]>;
 }
@@ -33,6 +34,13 @@ const createTauriImageService = (): ImageServiceInterface => ({
     }
     return new Uint8Array(result.data);
   },
+  getImagePath: async (name: string) => {
+    const result = await commands.getImagePath(name);
+    if (result.status === 'error') {
+      throw new Error(result.error);
+    }
+    return result.data;
+  },
   removeImage: async (name: string) => {
     const result = await commands.removeImage(name);
     if (result.status === 'error') {
@@ -57,6 +65,10 @@ const createWebImageService = (): ImageServiceInterface => ({
   getImage: async (name: string) => {
     console.log('[WebImageService] getImage not implemented:', name);
     return new Uint8Array();
+  },
+  getImagePath: async (name: string) => {
+    console.log('[WebImageService] getImagePath not implemented:', name);
+    return '';
   },
   removeImage: async (name: string) => {
     console.log('[WebImageService] removeImage not implemented:', name);

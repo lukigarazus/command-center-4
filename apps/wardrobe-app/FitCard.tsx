@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Fit, ClothingPiece } from './types';
 import { invoke } from '@tauri-apps/api/core';
+import { convertFileSrc } from '@tauri-apps/api/core';
 
 interface FitCardProps {
   fit: Fit;
@@ -22,14 +23,13 @@ export function FitCard({ fit, clothing, onEdit, onDelete, onMarkWorn }: FitCard
     ? new Date(fit.wornAt[fit.wornAt.length - 1]).toLocaleDateString()
     : 'Never';
 
-  // Load preview image
+  // Load preview image using asset protocol
   useEffect(() => {
     const loadPreview = async () => {
       try {
-        const imageData = await invoke<number[]>('get_image', { name: fit.previewImage });
-        const blob = new Blob([new Uint8Array(imageData)], { type: 'image/png' });
-        const url = URL.createObjectURL(blob);
-        setPreviewUrl(url);
+        const imagePath = await invoke<string>('get_image_path', { name: fit.previewImage });
+        const assetUrl = convertFileSrc(imagePath);
+        setPreviewUrl(assetUrl);
       } catch (e) {
         console.error(`Failed to load fit preview for ${fit.name}:`, e);
         setImageError(true);
@@ -37,12 +37,6 @@ export function FitCard({ fit, clothing, onEdit, onDelete, onMarkWorn }: FitCard
     };
 
     loadPreview();
-
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
   }, [fit.previewImage]);
 
   return (

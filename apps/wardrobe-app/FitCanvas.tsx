@@ -3,6 +3,7 @@ import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva';
 import Konva from 'konva';
 import { ClothingPiece, FitClothingPosition } from './types';
 import { invoke } from '@tauri-apps/api/core';
+import { convertFileSrc } from '@tauri-apps/api/core';
 
 interface FitCanvasProps {
   clothing: ClothingPiece[];
@@ -34,7 +35,7 @@ export const FitCanvas = forwardRef<FitCanvasRef, FitCanvasProps>(
     const transformerRef = useRef<Konva.Transformer>(null);
     const stageRef = useRef<Konva.Stage>(null);
 
-  // Load images for selected clothing
+  // Load images for selected clothing using asset protocol
   useEffect(() => {
     const loadImages = async () => {
       const newImages = new Map<string, HTMLImageElement>();
@@ -42,14 +43,14 @@ export const FitCanvas = forwardRef<FitCanvasRef, FitCanvasProps>(
       for (const item of selectedClothing) {
         if (!images.has(item.id)) {
           try {
-            const imageData = await invoke<number[]>('get_image', { name: item.image });
-            const blob = new Blob([new Uint8Array(imageData)], { type: 'image/png' });
-            const url = URL.createObjectURL(blob);
+            const imagePath = await invoke<string>('get_image_path', { name: item.image });
+            const assetUrl = convertFileSrc(imagePath);
 
             const img = new window.Image();
-            img.src = url;
-            await new Promise((resolve) => {
+            img.src = assetUrl;
+            await new Promise((resolve, reject) => {
               img.onload = resolve;
+              img.onerror = reject;
             });
 
             newImages.set(item.id, img);

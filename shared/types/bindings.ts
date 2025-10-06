@@ -48,6 +48,14 @@ async getImage(name: string) : Promise<Result<number[], string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async getImagePath(name: string) : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_image_path", { name }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async removeImage(name: string) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("remove_image", { name }) };

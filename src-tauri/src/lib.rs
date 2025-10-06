@@ -58,6 +58,7 @@ pub fn run() {
         get_location,
         image_service::save_image,
         image_service::get_image,
+        image_service::get_image_path,
         image_service::remove_image,
         image_service::list_images,
         background_removal::remove_background

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ClothingPiece } from './types';
 import { useImageService } from '../../shared/contexts/ImageContext';
+import { convertFileSrc } from '@tauri-apps/api/core';
 
 interface ClothingCardProps {
   clothing: ClothingPiece;
@@ -16,21 +17,14 @@ export const ClothingCard = ({ clothing, onEdit, onDelete, onMarkWorn }: Clothin
   useEffect(() => {
     const loadImage = async () => {
       try {
-        const data = await imageService.getImage(clothing.image);
-        const blob = new Blob([data], { type: 'image/png' });
-        const url = URL.createObjectURL(blob);
-        setImageUrl(url);
+        const imagePath = await imageService.getImagePath(clothing.image);
+        const assetUrl = convertFileSrc(imagePath);
+        setImageUrl(assetUrl);
       } catch (e) {
         console.error('Failed to load image:', e);
       }
     };
     loadImage();
-
-    return () => {
-      if (imageUrl) {
-        URL.revokeObjectURL(imageUrl);
-      }
-    };
   }, [clothing.image, imageService]);
 
   const lastWorn = clothing.wornAt.length > 0

@@ -60,6 +60,22 @@ pub async fn get_image(app: tauri::AppHandle, name: String) -> Result<Vec<u8>, S
 
 #[tauri::command]
 #[specta::specta]
+pub async fn get_image_path(app: tauri::AppHandle, name: String) -> Result<String, String> {
+    let images_dir = get_images_dir(&app)?;
+    let file_path = images_dir.join(&name);
+
+    if !file_path.exists() {
+        return Err(format!("Image '{}' not found", name));
+    }
+
+    file_path
+        .to_str()
+        .ok_or_else(|| "Invalid path".to_string())
+        .map(|s| s.to_string())
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn remove_image(app: tauri::AppHandle, name: String) -> Result<(), String> {
     let images_dir = get_images_dir(&app)?;
     let file_path = images_dir.join(&name);
