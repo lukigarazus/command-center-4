@@ -30,4 +30,7 @@ dotenvy = "0.15"
 chrono = "0.4"
 moka = { version = "0.12", features = ["future"] }
 tauri-plugin-store = "2"
+image = "0.25"
+ort = { version = "2.0.0-rc.10", features = ["ndarray"] }
+ndarray = "0.16"
 

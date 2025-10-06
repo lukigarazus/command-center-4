@@ -34,6 +34,12 @@ const apps: App[] = [
     description: "Manage your friends list with avatars, tags, and meeting history",
     path: "/apps/friends-app/index.html",
   },
+  {
+    id: "wardrobe-app",
+    name: "Wardrobe",
+    description: "Manage your clothing with background-removed images and wear tracking",
+    path: "/apps/wardrobe-app/index.html",
+  },
 ];
 
 export default function TauriContainer() {

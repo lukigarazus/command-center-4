@@ -63,6 +63,14 @@ async listImages() : Promise<Result<ImageInfo[], string>> {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+async removeBackground(imageData: number[]) : Promise<Result<number[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("remove_background", { imageData }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
