@@ -1,14 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useStorage } from '../../shared/contexts/StorageContext';
-import { ClothingPiece, WeatherType, ClothingType } from './types';
+import { ClothingPiece, WeatherType, ClothingType, Fit } from './types';
 import { ClothingCard } from './ClothingCard';
 import { ClothingForm } from './ClothingForm';
+import { FitCard } from './FitCard';
+import { FitForm } from './FitForm';
+import { invoke } from '@tauri-apps/api/core';
+
+type ViewMode = 'clothing' | 'fits';
 
 export default function WardrobeApp() {
   const storage = useStorage();
+  const [viewMode, setViewMode] = useState<ViewMode>('clothing');
   const [clothing, setClothing] = useState<ClothingPiece[]>([]);
+  const [fits, setFits] = useState<Fit[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingClothing, setEditingClothing] = useState<ClothingPiece | null>(null);
+  const [isFitFormOpen, setIsFitFormOpen] = useState(false);
+  const [editingFit, setEditingFit] = useState<Fit | null>(null);
   const [filterWeather, setFilterWeather] = useState<WeatherType | null>(null);
   const [filterType, setFilterType] = useState<ClothingType | null>(null);
   const [sortBy, setSortBy] = useState<'name' | 'wornCount' | 'lastWorn'>('name');
@@ -28,10 +37,31 @@ export default function WardrobeApp() {
     loadClothing();
   }, [storage]);
 
+  // Load fits from storage
+  useEffect(() => {
+    const loadFits = async () => {
+      const stored = await storage.getItem('fits');
+      if (stored) {
+        try {
+          setFits(JSON.parse(stored));
+        } catch (e) {
+          console.error('Failed to parse fits:', e);
+        }
+      }
+    };
+    loadFits();
+  }, [storage]);
+
   // Save clothing to storage
   const saveClothing = async (updatedClothing: ClothingPiece[]) => {
     setClothing(updatedClothing);
     await storage.setItem('clothing', JSON.stringify(updatedClothing));
+  };
+
+  // Save fits to storage
+  const saveFits = async (updatedFits: Fit[]) => {
+    setFits(updatedFits);
+    await storage.setItem('fits', JSON.stringify(updatedFits));
   };
 
   const handleAddClothing = async (item: Omit<ClothingPiece, 'id'>) => {
@@ -72,6 +102,72 @@ export default function WardrobeApp() {
     setEditingClothing(null);
   };
 
+  // Fit handlers
+  const handleAddFit = async (fit: Omit<Fit, 'id'>) => {
+    const newFit: Fit = {
+      ...fit,
+      id: Date.now().toString(),
+    };
+    await saveFits([...fits, newFit]);
+    setIsFitFormOpen(false);
+  };
+
+  const handleEditFit = async (fit: Fit) => {
+    const updatedFits = fits.map((f) => (f.id === fit.id ? fit : f));
+    await saveFits(updatedFits);
+    setEditingFit(null);
+  };
+
+  const handleDeleteFit = async (id: string) => {
+    const fit = fits.find(f => f.id === id);
+
+    // Delete the fit's preview image if it exists
+    if (fit?.previewImage) {
+      try {
+        await invoke('remove_image', { name: fit.previewImage });
+      } catch (e) {
+        console.error('Failed to delete fit preview image:', e);
+      }
+    }
+
+    const updatedFits = fits.filter((f) => f.id !== id);
+    await saveFits(updatedFits);
+  };
+
+  const handleMarkFitWorn = async (id: string) => {
+    const fit = fits.find(f => f.id === id);
+    if (!fit) return;
+
+    const today = new Date().toISOString();
+
+    // Update fit's wornAt
+    const updatedFits = fits.map((f) =>
+      f.id === id
+        ? { ...f, wornAt: [...f.wornAt, today] }
+        : f
+    );
+
+    // Update each clothing item's wornAt
+    const updatedClothing = clothing.map((c) => {
+      if (fit.clothingPositions.some(pos => pos.clothingId === c.id)) {
+        return { ...c, wornAt: [...c.wornAt, today] };
+      }
+      return c;
+    });
+
+    await saveFits(updatedFits);
+    await saveClothing(updatedClothing);
+  };
+
+  const openEditFitForm = (fit: Fit) => {
+    setEditingFit(fit);
+  };
+
+  const closeFitForm = () => {
+    setIsFitFormOpen(false);
+    setEditingFit(null);
+  };
+
   // Filter and sort clothing
   const filteredClothing = clothing
     .filter((item) => {
@@ -100,17 +196,42 @@ export default function WardrobeApp() {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-primary">Wardrobe</h1>
-          <button
-            onClick={() => setIsFormOpen(true)}
-            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors font-semibold"
-          >
-            Add Clothing
-          </button>
+          <div className="flex gap-3">
+            <div className="flex bg-surface border border-primary rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode('clothing')}
+                className={`px-4 py-2 font-semibold transition-colors ${
+                  viewMode === 'clothing'
+                    ? 'bg-accent text-white'
+                    : 'text-primary hover:bg-primary/10'
+                }`}
+              >
+                Clothing
+              </button>
+              <button
+                onClick={() => setViewMode('fits')}
+                className={`px-4 py-2 font-semibold transition-colors ${
+                  viewMode === 'fits'
+                    ? 'bg-accent text-white'
+                    : 'text-primary hover:bg-primary/10'
+                }`}
+              >
+                Fits
+              </button>
+            </div>
+            <button
+              onClick={() => viewMode === 'clothing' ? setIsFormOpen(true) : setIsFitFormOpen(true)}
+              className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors font-semibold"
+            >
+              {viewMode === 'clothing' ? 'Add Clothing' : 'Create Fit'}
+            </button>
+          </div>
         </div>
 
-        {/* Filters and Sort */}
-        <div className="bg-surface rounded-lg shadow p-4 mb-6 border border-primary">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Filters and Sort - Only show for clothing view */}
+        {viewMode === 'clothing' && (
+          <div className="bg-surface rounded-lg shadow p-4 mb-6 border border-primary">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Weather Filter */}
             <div>
               <label className="block text-sm font-semibold text-primary mb-2">Filter by Weather</label>
@@ -159,10 +280,12 @@ export default function WardrobeApp() {
               </select>
             </div>
           </div>
-        </div>
+          </div>
+        )}
 
         {/* Clothing Grid */}
-        {filteredClothing.length === 0 ? (
+        {viewMode === 'clothing' && (
+          filteredClothing.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-secondary text-lg">
               {clothing.length === 0
@@ -182,9 +305,34 @@ export default function WardrobeApp() {
               />
             ))}
           </div>
+          )
         )}
 
-        {/* Add/Edit Form Modal */}
+        {/* Fits Grid */}
+        {viewMode === 'fits' && (
+          fits.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-secondary text-lg">
+                No fits yet. Create your first fit!
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {fits.map((fit) => (
+                <FitCard
+                  key={fit.id}
+                  fit={fit}
+                  clothing={clothing}
+                  onEdit={() => openEditFitForm(fit)}
+                  onDelete={() => handleDeleteFit(fit.id)}
+                  onMarkWorn={() => handleMarkFitWorn(fit.id)}
+                />
+              ))}
+            </div>
+          )
+        )}
+
+        {/* Add/Edit Clothing Form Modal */}
         {(isFormOpen || editingClothing) && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-surface rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-primary">
@@ -192,6 +340,20 @@ export default function WardrobeApp() {
                 clothing={editingClothing || undefined}
                 onSave={editingClothing ? handleEditClothing : handleAddClothing}
                 onCancel={closeForm}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Add/Edit Fit Form Modal */}
+        {(isFitFormOpen || editingFit) && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-surface rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-primary">
+              <FitForm
+                fit={editingFit || undefined}
+                clothing={clothing}
+                onSave={editingFit ? handleEditFit : handleAddFit}
+                onCancel={closeFitForm}
               />
             </div>
           </div>
